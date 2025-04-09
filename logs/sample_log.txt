@@ -1,0 +1,6 @@
+User: janedoe
+Device: iPhone Mail App
+Time: 2025-04-09 02:35 AM
+Failure Reason: bad password
+Attempts: 9 from 192.168.10.22
+Notes: Password was recently reset by IT. User said they forgot to update phone settings.

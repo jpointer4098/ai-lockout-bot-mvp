@@ -1,0 +1,10 @@
+{"timestamp": "2025-04-09T02:35:00", "user": "janedoe", "device": "iPhone Mail App", "ip": "192.168.10.22", "cause": "bad password after reset", "location": "Raleigh, NC"}
+{"timestamp": "2025-04-09T03:12:00", "user": "janedoe", "device": "MacBook Pro", "ip": "192.168.10.30", "cause": "cached credentials from previous session", "location": "Raleigh, NC"}
+{"timestamp": "2025-04-09T04:20:00", "user": "johndoe", "device": "Windows Service - Finance App", "ip": "10.0.0.42", "cause": "scheduled task using expired service account password", "location": "Charlotte, NC"}
+{"timestamp": "2025-04-09T05:40:00", "user": "janedoe", "device": "Outlook Android", "ip": "192.168.10.22", "cause": "background retry with outdated credentials", "location": "Raleigh, NC"}
+{"timestamp": "2025-04-09T06:00:00", "user": "adminsvc", "device": "Domain Controller", "ip": "10.0.0.1", "cause": "brute-force attack detected from external IP", "location": "Unknown"}
+{"timestamp": "2025-04-09T06:30:00", "user": "alexsmith", "device": "Windows 10 Laptop", "ip": "10.0.2.20", "cause": "user forgot to update credentials after IT reset", "location": "Remote (VPN)"}
+{"timestamp": "2025-04-09T07:10:00", "user": "alexsmith", "device": "Android Gmail App", "ip": "10.0.2.21", "cause": "mobile device kept retrying with saved password", "location": "Remote (VPN)"}
+{"timestamp": "2025-04-09T08:00:00", "user": "michael.lee", "device": "Surface Pro", "ip": "192.168.11.15", "cause": "multiple remote desktop sessions with outdated cached credentials", "location": "Atlanta, GA"}
+{"timestamp": "2025-04-09T08:45:00", "user": "janedoe", "device": "Outlook Desktop", "ip": "192.168.10.25", "cause": "Outlook retrying saved credentials", "location": "Raleigh, NC"}
+{"timestamp": "2025-04-09T09:00:00", "user": "adminsvc", "device": "Server 1", "ip": "10.0.0.99", "cause": "automated script not updated with new password", "location": "Datacenter"}

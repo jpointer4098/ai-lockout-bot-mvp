@@ -1,0 +1,7 @@
+streamlit
+python-dotenv
+requests
+pandas
+fpdf
+pydeck
+geopy
