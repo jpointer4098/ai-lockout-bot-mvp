@@ -1,3 +1,6 @@
+import unicodedata
+from fpdf import FPDF
+import pydeck as pdk
 import streamlit as st
 import json
 import os
@@ -15,6 +18,8 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Inst
 headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
 # Load sample logs
+
+
 @st.cache_data
 def load_sample_logs():
     try:
@@ -24,10 +29,14 @@ def load_sample_logs():
         return []
 
 # Convert logs to DataFrame
+
+
 def logs_to_df(logs):
     return pd.DataFrame(logs)
 
 # Build AI prompt
+
+
 def build_prompt(question, logs):
     summary = "\n".join([
         f"[{log['timestamp']}] User: {log['user']}, Device: {log['device']}, IP: {log['ip']}, Cause: {log['cause']}, Location: {log['location']}"
@@ -46,9 +55,12 @@ User's question:
 """
 
 # Call Hugging Face API
+
+
 def ask_ai(prompt):
     try:
-        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+        response = requests.post(
+            API_URL, headers=headers, json={"inputs": prompt})
         result = response.json()
 
         # Hugging Face returned an error object
@@ -67,8 +79,6 @@ def ask_ai(prompt):
 
     except Exception as e:
         return f"❌ Failed to contact Hugging Face API: {e}"
-
-
 
 
 # UI setup
@@ -105,7 +115,8 @@ with col4:
 
 with col5:
     st.markdown("**Lockouts by Device Type**")
-    device_counts = df['device'].apply(lambda x: x.split()[0]).value_counts().head(5)
+    device_counts = df['device'].apply(
+        lambda x: x.split()[0]).value_counts().head(5)
     st.bar_chart(device_counts)
 
 st.markdown("---")
@@ -122,10 +133,11 @@ location_coords = {
     "Unknown": (0, 0)
 }
 
-df["lat"] = df["location"].apply(lambda loc: location_coords.get(loc, (0, 0))[0])
-df["lon"] = df["location"].apply(lambda loc: location_coords.get(loc, (0, 0))[1])
+df["lat"] = df["location"].apply(
+    lambda loc: location_coords.get(loc, (0, 0))[0])
+df["lon"] = df["location"].apply(
+    lambda loc: location_coords.get(loc, (0, 0))[1])
 
-import pydeck as pdk
 
 # Create a pydeck layer from your DataFrame
 layer = pdk.Layer(
@@ -164,7 +176,8 @@ st.markdown("### 💬 Ask About a Specific User")
 user_list = df["user"].unique().tolist()
 selected_user = st.selectbox("Select a user", user_list)
 
-custom_question = st.text_input("Optional: Add details or ask a custom question")
+custom_question = st.text_input(
+    "Optional: Add details or ask a custom question")
 
 if st.button("🔍 Ask AI About Lockouts"):
     with st.spinner("Analyzing with AI..."):
@@ -187,13 +200,17 @@ fixes = []
 
 for cause in causes:
     if "mobile" in cause or "gmail" in cause or "mail app" in cause:
-        fixes.append("📱 Ask user to update saved credentials on mobile apps (Gmail, Outlook, iOS Mail).")
+        fixes.append(
+            "📱 Ask user to update saved credentials on mobile apps (Gmail, Outlook, iOS Mail).")
     if "cached" in cause:
-        fixes.append("🧹 Clear cached credentials from user profile or credential manager.")
+        fixes.append(
+            "🧹 Clear cached credentials from user profile or credential manager.")
     if "brute" in cause:
-        fixes.append("🛡️ Check firewall rules and enable lockout threshold alerts.")
+        fixes.append(
+            "🛡️ Check firewall rules and enable lockout threshold alerts.")
     if "service account" in cause or "script" in cause:
-        fixes.append("🔁 Rotate service account passwords and update in all scripts.")
+        fixes.append(
+            "🔁 Rotate service account passwords and update in all scripts.")
     if "scheduled task" in cause:
         fixes.append("📅 Review all scheduled tasks for outdated logins.")
     if "vpn" in cause:
@@ -204,10 +221,11 @@ for fix in set(fixes):
 
 # CSV Export
 csv_data = df.to_csv(index=False)
-st.download_button("⬇️ Download CSV", data=csv_data, file_name="lockouts.csv", mime="text/csv")
+st.download_button("⬇️ Download CSV", data=csv_data,
+                   file_name="lockouts.csv", mime="text/csv")
 
 # PDF Export
-from fpdf import FPDF
+
 
 class PDF(FPDF):
     def header(self):
@@ -219,12 +237,12 @@ class PDF(FPDF):
         self.set_font("Arial", "I", 8)
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
 
-import unicodedata
 
 def clean_text(text):
     # Normalize unicode characters and remove non-latin1 safely
     text = unicodedata.normalize("NFKD", text)
     return text.encode("latin-1", errors="replace").decode("latin-1")
+
 
 def generate_pdf(summary_text):
     clean_summary = clean_text(summary_text)
@@ -233,6 +251,7 @@ def generate_pdf(summary_text):
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 10, clean_summary)
     return pdf.output(dest="S").encode("latin-1", errors="replace")
+
 
 if st.button("⬇️ Generate PDF Summary"):
     top_user = df['user'].value_counts().idxmax()
@@ -248,7 +267,8 @@ if st.button("⬇️ Generate PDF Summary"):
     Thank you for using the AI Lockout Assistant.
     """
     pdf_bytes = generate_pdf(summary)
-    st.download_button("📄 Download PDF", data=pdf_bytes, file_name="lockout_summary.pdf", mime="application/pdf")
+    st.download_button("📄 Download PDF", data=pdf_bytes,
+                       file_name="lockout_summary.pdf", mime="application/pdf")
 
 # 📂 Raw logs
 with st.expander("📄 View Full Log Records"):
