@@ -175,20 +175,40 @@ st.subheader("💬 Ask About Lockouts (AI Assistant)")
 
 st.markdown("### 💬 Ask About a Specific User")
 
-user_list = df["user"].unique().tolist()
-selected_user = st.selectbox("Select a user", user_list)
+# Free-text input for partial username
+user_input = st.text_input("Enter the username (or part of it):")
 
-custom_question = st.text_input(
-    "Optional: Add details or ask a custom question")
+selected_user = None
 
-if st.button("🔍 Ask AI About Lockouts"):
-    with st.spinner("Analyzing with AI..."):
-        base_question = f"Why is {selected_user} getting locked out?"
-        full_question = f"{base_question}. {custom_question}" if custom_question else base_question
-        prompt = build_prompt(full_question, logs)
-        answer = ask_ai(prompt)
-    st.success("✅ AI Response:")
-    st.write(answer)
+if user_input:
+    known_users = df["user"].dropna().unique().tolist()
+    best_match = None
+    score = 0
+
+    # Fuzzy match the input
+    if len(known_users) > 0:
+        from rapidfuzz import process
+        best_match, score, _ = process.extractOne(user_input, known_users)
+
+    if best_match and score >= 70:
+        st.info(f"Did you mean: **{best_match}**? (Confidence: {score:.1f})")
+        if st.button("✅ Yes, use this user"):
+            selected_user = best_match
+    else:
+        st.warning("No close match found. Try another name.")
+
+if selected_user:
+    custom_detail = st.text_input("Optional: Add extra context (e.g. 'locked out 3 times today')")
+    if st.button("🔍 Analyze Lockout"):
+        full_question = f"Why is {selected_user} getting locked out?"
+        if custom_detail:
+            full_question += f" {custom_detail}"
+        with st.spinner("Analyzing..."):
+            prompt = build_prompt(full_question, logs)
+            answer = ask_ai(prompt)
+        st.success("✅ AI Response:")
+        st.write(answer)
+
 
     # 📤 Export Section
 st.markdown("---")
