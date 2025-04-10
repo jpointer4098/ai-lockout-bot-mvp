@@ -1,4 +1,3 @@
-nano app/chat_ui.py
 import streamlit as st
 import json
 import os
