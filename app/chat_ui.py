@@ -1,3 +1,4 @@
+nano app/chat_ui.py
 import streamlit as st
 import json
 import os
@@ -47,9 +48,26 @@ User's question:
 
 # Call Hugging Face API
 def ask_ai(prompt):
-    response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
-    return response.json()[0]["generated_text"]
+    try:
+        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+        result = response.json()
 
+        # If API returned an error
+        if isinstance(result, dict) and "error" in result:
+            return f"❌ Hugging Face API Error: {result['error']}"
+
+        # Valid response
+        if isinstance(result, list) and len(result) > 0:
+            if "generated_text" in result[0]:
+                return result[0]["generated_text"]
+            else:
+                return f"❌ Response missing 'generated_text': {result[0]}"
+
+        # Unexpected case
+        return f"❌ Unexpected response structure: {result}"
+
+    except Exception as e:
+        return f"❌ Failed to contact Hugging Face API: {e}"
 # UI setup
 st.set_page_config(page_title="AI Lockout Assistant", layout="wide")
 st.title("🛡️ AI Lockout Assistant — Partner Demo")
@@ -138,14 +156,28 @@ st.pydeck_chart(deck)
 # 💬 AI Assistant
 st.subheader("💬 Ask About Lockouts (AI Assistant)")
 
-question = st.chat_input("Ask a question like 'Why is Jane Doe locked out?'")
+st.markdown("### 💬 Ask About a Specific User")
 
-if question:
-    with st.spinner("Analyzing with AI..."):
-        prompt = build_prompt(question, logs)
+# 1. Dropdown for selecting a known user
+user_list = df["user"].unique().tolist()
+selected_user = st.selectbox("Select a user to analyze", options=user_list)
+
+# 2. Optional detail input
+custom_detail = st.text_input("Optional: Add extra context (e.g. 'this happened three times today')")
+
+# 3. Button to trigger AI assistant
+if st.button("🔍 Analyze Lockout"):
+    full_question = f"Why is {selected_user} getting locked out?"
+    if custom_detail:
+        full_question += f" {custom_detail}"
+    
+    with st.spinner("Analyzing..."):
+        prompt = build_prompt(full_question, logs)
         answer = ask_ai(prompt)
-    st.success("✅ Response:")
+
+    st.success("✅ AI Response:")
     st.write(answer)
+
     # 📤 Export Section
 st.markdown("---")
 st.subheader("📥 Export Reports")
@@ -162,6 +194,7 @@ for cause in causes:
         fixes.append("🧹 Clear cached credentials from user profile or credential manager.")
     if "brute" in cause:
         fixes.append("🛡️ Check firewall rules and enable lockout threshold alerts.")
+return response.json()[0]["generated_text"]
     if "service account" in cause or "script" in cause:
         fixes.append("🔁 Rotate service account passwords and update in all scripts.")
     if "scheduled task" in cause:
