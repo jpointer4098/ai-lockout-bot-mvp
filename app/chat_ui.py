@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from datetime import datetime
 import matplotlib.pyplot as plt
 from collections import Counter
+from rapidfuzz import process
+
 
 # Load token
 load_dotenv()
