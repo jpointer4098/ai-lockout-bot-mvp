@@ -5,3 +5,5 @@ pandas
 fpdf
 pydeck
 geopy
+matplotlib
+
